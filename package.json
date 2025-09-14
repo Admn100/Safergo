@@ -1,7 +1,7 @@
 {
-  "name": "safargo-monorepo",
+  "name": "safargo",
   "version": "1.0.0",
-  "description": "SafarGo - Covoiturage & Tourisme Algérie",
+  "description": "SafarGo - Covoiturage & Tourisme Algérie 🇩🇿",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -15,20 +15,23 @@
     "type-check": "turbo run type-check",
     "clean": "turbo run clean",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "turbo run build --filter=!@safargo/docs && changeset publish"
+    "db:migrate": "pnpm -C apps/api prisma:migrate",
+    "db:seed": "pnpm -C apps/api prisma:seed",
+    "db:studio": "pnpm -C apps/api prisma:studio",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose up --build",
+    "setup": "pnpm install && pnpm db:migrate && pnpm db:seed"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.1",
-    "@turbo/gen": "^1.12.4",
-    "prettier": "^3.2.5",
-    "turbo": "^1.12.4",
-    "typescript": "^5.3.3"
+    "@types/node": "^20.10.0",
+    "prettier": "^3.1.0",
+    "turbo": "^1.11.0",
+    "typescript": "^5.3.0"
   },
-  "packageManager": "pnpm@8.15.0",
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=8.0.0"
-  }
+  },
+  "packageManager": "pnpm@8.15.0"
 }

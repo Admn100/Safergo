@@ -1,26 +1,26 @@
 version: '3.8'
 
 services:
-  # Database
+  # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
     container_name: safargo-postgres
     environment:
       POSTGRES_DB: safargo
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: safargo
+      POSTGRES_PASSWORD: safargo
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./apps/api/prisma/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U safargo -d safargo"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # Redis (for caching and sessions)
+  # Redis (optional, for caching and sessions)
   redis:
     image: redis:7-alpine
     container_name: safargo-redis
@@ -34,32 +34,18 @@ services:
       timeout: 5s
       retries: 5
 
-  # API
+  # API Backend
   api:
     build:
-      context: ./apps/api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/api/Dockerfile
     container_name: safargo-api
     environment:
-      NODE_ENV: development
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/safargo
-      REDIS_URL: redis://redis:6379
-      JWT_SECRET: your-super-secret-jwt-key-64-chars-minimum
-      JWT_EXPIRES_IN: 7d
-      STORAGE_ENDPOINT: http://minio:9000
-      STORAGE_BUCKET: safargo-assets
-      STORAGE_KEY: minioadmin
-      STORAGE_SECRET: minioadmin
-      STORAGE_REGION: us-east-1
-      PAYMENT_KEY: sk_test_...
-      PAYMENT_WEBHOOK_SECRET: whsec_...
-      MAPBOX_TOKEN: pk.eyJ1IjoieW91ci10b2tlbiIsImEiOiJjbGV4YW1wbGUifQ
-      EMAIL_API_KEY: SG.your-sendgrid-api-key
-      SMS_API_KEY: your-twilio-account-sid
-      SMS_SECRET: your-twilio-auth-token
-      SMS_FROM: +1234567890
-      FCM_SERVER_KEY: your-fcm-server-key
-      SENTRY_DSN: https://your-sentry-dsn@sentry.io/project-id
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://safargo:safargo@postgres:5432/safargo?schema=public
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=dev-jwt-secret-change-in-production
+      - PORT=3001
     ports:
       - "3001:3001"
     depends_on:
@@ -72,18 +58,16 @@ services:
       - /app/node_modules
     command: pnpm dev
 
-  # Web App
+  # Web Frontend
   web:
     build:
-      context: ./apps/web
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/web/Dockerfile
     container_name: safargo-web
     environment:
-      NODE_ENV: development
-      NEXT_PUBLIC_API_URL: http://localhost:3001
-      NEXT_PUBLIC_APP_URL: http://localhost:3000
-      NEXT_PUBLIC_ADMIN_URL: http://localhost:3000/admin
-      MAPBOX_TOKEN: pk.eyJ1IjoieW91ci10b2tlbiIsImEiOiJjbGV4YW1wbGUifQ
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+      - NEXT_PUBLIC_MAPBOX_TOKEN=pk.eyJ1IjoieW91ci10b2tlbiIsImEiOiJjbGV4YW1wbGUifQ.example
     ports:
       - "3000:3000"
     depends_on:
@@ -93,13 +77,13 @@ services:
       - /app/node_modules
     command: pnpm dev
 
-  # MinIO (S3-compatible storage)
+  # MinIO (S3-compatible storage for development)
   minio:
     image: minio/minio:latest
     container_name: safargo-minio
     environment:
       MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -112,23 +96,20 @@ services:
       timeout: 20s
       retries: 3
 
-  # Nginx (Reverse Proxy)
-  nginx:
-    image: nginx:alpine
-    container_name: safargo-nginx
+  # Grafana (Monitoring)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: safargo-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     ports:
-      - "80:80"
-      - "443:443"
+      - "3002:3000"
     volumes:
-      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./infra/nginx/ssl:/etc/nginx/ssl
-    depends_on:
-      - web
-      - api
-    profiles:
-      - production
+      - grafana_data:/var/lib/grafana
+      - ./infra/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./infra/grafana/datasources:/etc/grafana/provisioning/datasources
 
-  # Monitoring
+  # Prometheus (Metrics)
   prometheus:
     image: prom/prometheus:latest
     container_name: safargo-prometheus
@@ -144,26 +125,10 @@ services:
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--storage.tsdb.retention.time=200h'
       - '--web.enable-lifecycle'
-    profiles:
-      - monitoring
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: safargo-grafana
-    ports:
-      - "3001:3000"
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./infra/grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ./infra/grafana/datasources:/etc/grafana/provisioning/datasources
-    profiles:
-      - monitoring
 
 volumes:
   postgres_data:
   redis_data:
   minio_data:
-  prometheus_data:
   grafana_data:
+  prometheus_data:

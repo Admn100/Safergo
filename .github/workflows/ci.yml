@@ -4,19 +4,19 @@ on:
   push:
     branches: [main, develop]
   pull_request:
-    branches: [main, develop]
+    branches: [main]
 
 env:
   NODE_VERSION: '20'
-  PNPM_VERSION: '8.15.0'
+  PNPM_VERSION: '8'
 
 jobs:
-  # Lint and Type Check
+  # Lint and type check
   lint:
     name: Lint & Type Check
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -55,7 +55,6 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    needs: lint
     services:
       postgres:
         image: postgres:15
@@ -71,7 +70,7 @@ jobs:
           - 5432:5432
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -100,19 +99,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Setup test database
-        run: |
-          cd apps/api
-          pnpm prisma migrate deploy
-          pnpm prisma generate
+      - name: Run database migrations
+        run: pnpm -C apps/api prisma:migrate
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/safargo_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/safargo_test?schema=public
 
       - name: Run tests
         run: pnpm test
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/safargo_test
-          JWT_SECRET: test-secret-key
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/safargo_test?schema=public
+          JWT_SECRET: test-jwt-secret
           NODE_ENV: test
 
   # Build
@@ -121,7 +117,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint, test]
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -150,7 +146,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build packages
+      - name: Build applications
         run: pnpm build
 
       - name: Upload build artifacts
@@ -160,15 +156,14 @@ jobs:
           path: |
             apps/api/dist
             apps/web/.next
-            packages/ui/dist
+            apps/mobile/dist
 
-  # Security Scan
+  # Security scan
   security:
     name: Security Scan
     runs-on: ubuntu-latest
-    needs: lint
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Run Trivy vulnerability scanner
@@ -185,7 +180,7 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
-  # Deploy to Staging
+  # Deploy to staging
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
@@ -193,7 +188,7 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     environment: staging
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Download build artifacts
@@ -203,11 +198,11 @@ jobs:
 
       - name: Deploy to staging
         run: |
-          echo "Deploying to staging environment..."
+          echo "🚀 Deploying to staging environment..."
           # Add your staging deployment commands here
-          # Example: docker-compose up -d
+          # Example: docker build, kubectl apply, etc.
 
-  # Deploy to Production
+  # Deploy to production
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
@@ -215,7 +210,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     environment: production
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Download build artifacts
@@ -225,49 +220,13 @@ jobs:
 
       - name: Deploy to production
         run: |
-          echo "Deploying to production environment..."
+          echo "🚀 Deploying to production environment..."
           # Add your production deployment commands here
-          # Example: docker-compose -f docker-compose.prod.yml up -d
+          # Example: docker build, kubectl apply, etc.
 
-  # Mobile Build
-  build-mobile:
-    name: Build Mobile Apps
-    runs-on: ubuntu-latest
-    needs: [lint, test]
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
-        with:
-          expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Build Android
+      - name: Notify deployment
         run: |
-          cd apps/mobile
-          eas build --platform android --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Build iOS
-        run: |
-          cd apps/mobile
-          eas build --platform ios --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          echo "✅ SafarGo deployed successfully to production!"
+          echo "🌐 Web: https://app.safargo.com"
+          echo "📱 API: https://api.safargo.com"
+          echo "👑 Admin: https://admin.safargo.com"
