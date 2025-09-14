@@ -8,5 +8,4 @@ export { Badge, badgeVariants } from './components/Badge'
 // Utilities
 export { cn, formatCurrency, formatDate, formatDateTime, formatTime, getTourismCategoryColor, getTourismCategoryEmoji, getTourismCategoryLabel, calculateDistance, formatDistance, generateSlug, truncateText, isValidEmail, isValidPhoneNumber, formatPhoneNumber, debounce, throttle } from './lib/utils'
 
-// Styles
-export './styles/globals.css'
+// Styles - import separately as needed

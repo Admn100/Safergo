@@ -125,7 +125,7 @@ export function calculateDistance(
   return R * c
 }
 
-export function formatDistance(distance: number, locale: string = 'fr'): string {
+export function formatDistance(distance: number): string {
   if (distance < 1) {
     return `${Math.round(distance * 1000)}m`
   }

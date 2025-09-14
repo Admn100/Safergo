@@ -24,15 +24,16 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  driverProfile Driver?
-  bookings      Booking[]
-  reviews       Review[]
-  sentMessages  Message[] @relation("MessageSender")
-  conversations Conversation[] @relation("ConversationParticipant")
-  auditLogs     AuditLog[]
-  notifications Notification[]
-  kycDocs       KycDoc[]
-  placeReviews  PlaceReview[]
+  driverProfile   Driver?
+  bookings        Booking[]
+  reviewsGiven    Review[] @relation("ReviewsGiven")
+  reviewsReceived Review[] @relation("ReviewsReceived")
+  sentMessages    Message[] @relation("MessageSender")
+  conversations   Conversation[] @relation("ConversationParticipant")
+  auditLogs       AuditLog[]
+  notifications   Notification[]
+  kycDocs         KycDoc[]
+  placeReviews    PlaceReview[]
 
   @@map("users")
 }
@@ -91,12 +92,13 @@ model Trip {
   updatedAt   DateTime  @updatedAt
 
   // Relations
-  driver     Driver    @relation(fields: [driverId], references: [id], onDelete: Cascade)
-  vehicle    Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-  bookings   Booking[]
-  reviews    Review[]
-  place      Place?    @relation(fields: [placeId], references: [id])
-  itinerary  Itinerary? @relation(fields: [itineraryId], references: [id])
+  driver        Driver        @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  vehicle       Vehicle       @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  bookings      Booking[]
+  reviews       Review[]
+  conversations Conversation[]
+  place         Place?        @relation(fields: [placeId], references: [id])
+  itinerary     Itinerary?    @relation(fields: [itineraryId], references: [id])
 
   @@map("trips")
 }
@@ -176,8 +178,8 @@ model Review {
   createdAt DateTime @default(now())
 
   // Relations
-  fromUser User @relation(fields: [fromUserId], references: [id], onDelete: Cascade)
-  toUser   User @relation(fields: [toUserId], references: [id], onDelete: Cascade)
+  fromUser User @relation("ReviewsGiven", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser   User @relation("ReviewsReceived", fields: [toUserId], references: [id], onDelete: Cascade)
   trip     Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
 
   @@map("reviews")

@@ -77,7 +77,7 @@ export class AdminService {
         _count: {
           select: {
             bookings: true,
-            reviews: true,
+            reviewsGiven: true,
           },
         },
       },
@@ -170,7 +170,7 @@ export class AdminService {
       include: {
         _count: {
           select: {
-            reviews: true,
+            reviewsGiven: true,
             trips: true,
           },
         },

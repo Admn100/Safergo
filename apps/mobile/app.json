@@ -17,12 +17,13 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.safargo.app",
-      "buildNumber": "1",
+      "buildNumber": "1.0.0",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "SafarGo utilise votre localisation pour vous aider à trouver des trajets à proximité et explorer les lieux touristiques.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "SafarGo utilise votre localisation pour vous aider à trouver des trajets à proximité et explorer les lieux touristiques.",
-        "NSCameraUsageDescription": "SafarGo utilise l'appareil photo pour vous permettre de prendre des photos de votre profil et de vos documents.",
-        "NSPhotoLibraryUsageDescription": "SafarGo accède à votre photothèque pour vous permettre de sélectionner des photos pour votre profil."
+        "NSLocationWhenInUseUsageDescription": "SafarGo utilise votre localisation pour trouver des trajets à proximité et afficher la carte.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "SafarGo utilise votre localisation pour trouver des trajets à proximité et afficher la carte.",
+        "NSCameraUsageDescription": "SafarGo utilise l'appareil photo pour prendre des photos de profil et de véhicules.",
+        "NSPhotoLibraryUsageDescription": "SafarGo accède à votre photothèque pour sélectionner des photos de profil et de véhicules.",
+        "NSMicrophoneUsageDescription": "SafarGo utilise le microphone pour les appels vocaux entre utilisateurs."
       }
     },
     "android": {
@@ -37,7 +38,11 @@
         "ACCESS_COARSE_LOCATION",
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
+        "WRITE_EXTERNAL_STORAGE",
+        "RECORD_AUDIO",
+        "VIBRATE",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
       ]
     },
     "web": {
@@ -49,7 +54,19 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "SafarGo utilise votre localisation pour vous aider à trouver des trajets à proximité et explorer les lieux touristiques."
+          "locationAlwaysAndWhenInUsePermission": "SafarGo utilise votre localisation pour trouver des trajets à proximité et afficher la carte."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "SafarGo utilise l'appareil photo pour prendre des photos de profil et de véhicules."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "SafarGo accède à votre photothèque pour sélectionner des photos de profil et de véhicules."
         }
       ],
       [
@@ -57,13 +74,7 @@
         {
           "icon": "./assets/notification-icon.png",
           "color": "#006233",
-          "sounds": ["./assets/notification-sound.wav"]
-        }
-      ],
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "SafarGo utilise l'appareil photo pour vous permettre de prendre des photos de votre profil et de vos documents."
+          "defaultChannel": "default"
         }
       ]
     ],

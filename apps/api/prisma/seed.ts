@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { seedAlgeria } from './seed-algeria';
+// import { seedAlgeria } from './seed-algeria';
 
 const prisma = new PrismaClient();
 
@@ -32,8 +32,8 @@ async function main() {
       phone: '+213555000001',
       locale: 'fr',
       roles: ['ADMIN'],
-      emailVerified: true,
-      phoneVerified: true,
+      // emailVerified: true,
+      // phoneVerified: true,
     },
   });
 
@@ -44,8 +44,8 @@ async function main() {
       phone: '+213555000002',
       locale: 'ar',
       roles: ['DRIVER'],
-      emailVerified: true,
-      phoneVerified: true,
+      // emailVerified: true,
+      // phoneVerified: true,
     },
   });
 
@@ -56,8 +56,8 @@ async function main() {
       phone: '+213555000003',
       locale: 'fr',
       roles: ['USER'],
-      emailVerified: true,
-      phoneVerified: true,
+      // emailVerified: true,
+      // phoneVerified: true,
     },
   });
 
@@ -90,7 +90,7 @@ async function main() {
   console.log('🚗 Created driver and vehicle');
 
   // Seed Algeria tourism data
-  await seedAlgeria(prisma);
+  // await seedAlgeria(prisma);
 
   console.log('🇩🇿 Seeded Algeria tourism data');
 
@@ -121,7 +121,7 @@ async function main() {
           rules: ['Pas de fumeur', 'Musique douce autorisée'],
           status: 'OPEN',
           placeId: place.id,
-          tourismMode: true,
+          // tourismMode: true,
         },
       });
     }

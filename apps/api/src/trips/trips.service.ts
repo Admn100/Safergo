@@ -95,14 +95,14 @@ export class TripsService {
     // Seats filter
     if (seats) {
       where.seats = {
-        gte: parseInt(seats),
+        gte: seats,
       }
     }
 
     // Price filter
     if (maxPrice) {
       where.pricePerSeat = {
-        lte: parseFloat(maxPrice),
+        lte: maxPrice,
       }
     }
 

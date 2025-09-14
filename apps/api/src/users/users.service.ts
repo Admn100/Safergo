@@ -29,7 +29,7 @@ export class UsersService {
     }
 
     return this.prisma.user.create({
-      data: createUserDto,
+      data: createUserDto as any,
     })
   }
 
@@ -40,7 +40,7 @@ export class UsersService {
         _count: {
           select: {
             bookings: true,
-            reviews: true,
+            reviewsGiven: true,
           },
         },
       },
@@ -65,7 +65,7 @@ export class UsersService {
         _count: {
           select: {
             bookings: true,
-            reviews: true,
+            reviewsGiven: true,
           },
         },
       },

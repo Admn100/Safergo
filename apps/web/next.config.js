@@ -4,53 +4,19 @@ const nextConfig = {
     appDir: true,
   },
   images: {
-    domains: [
-      'localhost',
-      'example.com',
-      'images.unsplash.com',
-      'via.placeholder.com',
-    ],
+    domains: ['localhost', 'api.safargo.com'],
   },
-  i18n: {
-    locales: ['fr', 'ar'],
-    defaultLocale: 'fr',
-    localeDetection: true,
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+    NEXT_PUBLIC_MAPBOX_TOKEN: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
   },
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/:path*`,
       },
     ]
-  },
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
-          },
-        ],
-      },
-    ]
-  },
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      'mapbox-gl': 'maplibre-gl',
-    }
-    return config
   },
 }
 
