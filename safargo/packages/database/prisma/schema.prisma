@@ -1,0 +1,411 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  DRIVER
+  ADMIN
+}
+
+enum KycStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum TripStatus {
+  DRAFT
+  OPEN
+  CONFIRMED
+  DONE
+  CANCELLED
+}
+
+enum BookingStatus {
+  PENDING
+  HELD
+  CONFIRMED
+  CANCELLED
+  FINISHED
+}
+
+enum PaymentStatus {
+  INTENT
+  HOLD
+  CAPTURED
+  REFUNDED
+}
+
+enum DisputeStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum PlaceType {
+  BEACH
+  WATERFALL
+  MOUNTAIN
+  DESERT
+  HERITAGE
+  MUSEUM
+  FOOD
+  VIEWPOINT
+  PARK
+  OASIS
+  MEDINA
+  LAKE
+}
+
+enum SeasonType {
+  SUMMER
+  WINTER
+  ALL
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  PUSH
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  phone         String?        @unique
+  name          String
+  photo         String?
+  locale        String         @default("fr")
+  roles         UserRole[]
+  emailVerified Boolean        @default(false)
+  phoneVerified Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  driver              Driver?
+  bookings            Booking[]
+  messagesFrom        Message[]      @relation("MessageSender")
+  reviewsGiven        Review[]       @relation("ReviewFrom")
+  reviewsReceived     Review[]       @relation("ReviewTo")
+  notifications       Notification[]
+  auditLogs           AuditLog[]
+  placeReviews        PlaceReview[]
+  conversations       ConversationUser[]
+  kycDocs             KycDoc[]
+}
+
+model Driver {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  kycStatus     KycStatus @default(PENDING)
+  licenseNumber String?
+  badges        String[]
+  rating        Float     @default(0)
+  tripsCount    Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  vehicles Vehicle[]
+  trips    Trip[]
+}
+
+model Vehicle {
+  id        String   @id @default(cuid())
+  driverId  String
+  driver    Driver   @relation(fields: [driverId], references: [id])
+  make      String
+  model     String
+  year      Int
+  color     String
+  seats     Int
+  plate     String   @unique
+  photos    String[]
+  verified  Boolean  @default(false)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  trips Trip[]
+}
+
+model Trip {
+  id                String     @id @default(cuid())
+  driverId          String
+  driver            Driver     @relation(fields: [driverId], references: [id])
+  vehicleId         String?
+  vehicle           Vehicle?   @relation(fields: [vehicleId], references: [id])
+  originLat         Float
+  originLng         Float
+  originLabel       String
+  destinationLat    Float
+  destinationLng    Float
+  destinationLabel  String
+  dateTime          DateTime
+  seats             Int
+  availableSeats    Int
+  pricePerSeat      Float
+  currency          String     @default("DZD")
+  rules             String[]
+  status            TripStatus @default(DRAFT)
+  tourismMode       Boolean    @default(false)
+  placeId           String?
+  place             Place?     @relation(fields: [placeId], references: [id])
+  itineraryId       String?
+  itinerary         Itinerary? @relation(fields: [itineraryId], references: [id])
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  bookings Booking[]
+  reviews  Review[]
+
+  @@index([originLat, originLng])
+  @@index([destinationLat, destinationLng])
+  @@index([dateTime])
+  @@index([status])
+}
+
+model Booking {
+  id         String        @id @default(cuid())
+  tripId     String
+  trip       Trip          @relation(fields: [tripId], references: [id])
+  userId     String
+  user       User          @relation(fields: [userId], references: [id])
+  seats      Int
+  priceTotal Float
+  currency   String        @default("DZD")
+  status     BookingStatus @default(PENDING)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  payments Payment[]
+  dispute  Dispute?
+
+  @@unique([tripId, userId])
+  @@index([status])
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages Message[]
+  users    ConversationUser[]
+}
+
+model ConversationUser {
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  lastReadAt     DateTime?
+  
+  @@id([conversationId, userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  senderId       String
+  sender         User         @relation("MessageSender", fields: [senderId], references: [id])
+  text           String
+  flagged        Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  fromUserId String
+  fromUser   User     @relation("ReviewFrom", fields: [fromUserId], references: [id])
+  toUserId   String
+  toUser     User     @relation("ReviewTo", fields: [toUserId], references: [id])
+  tripId     String
+  trip       Trip     @relation(fields: [tripId], references: [id])
+  rating     Int
+  text       String?
+  moderated  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@unique([fromUserId, toUserId, tripId])
+  @@index([toUserId])
+}
+
+model Payment {
+  id         String        @id @default(cuid())
+  bookingId  String
+  booking    Booking       @relation(fields: [bookingId], references: [id])
+  intentId   String        @unique
+  status     PaymentStatus @default(INTENT)
+  amount     Float
+  currency   String        @default("DZD")
+  provider   String
+  metadata   Json?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([status])
+}
+
+model Dispute {
+  id         String        @id @default(cuid())
+  bookingId  String        @unique
+  booking    Booking       @relation(fields: [bookingId], references: [id])
+  reason     String
+  status     DisputeStatus @default(OPEN)
+  resolution String?
+  metadata   Json?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([status])
+}
+
+model KycDoc {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  type       String
+  url        String
+  status     KycStatus @default(PENDING)
+  reviewedBy String?
+  notes      String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  user      User                @relation(fields: [userId], references: [id])
+  channel   NotificationChannel
+  template  String
+  payload   Json
+  status    NotificationStatus  @default(PENDING)
+  sentAt    DateTime?
+  failedAt  DateTime?
+  error     String?
+  createdAt DateTime            @default(now())
+
+  @@index([userId])
+  @@index([status])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id])
+  action    String
+  entity    String
+  entityId  String
+  meta      Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([actorId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+
+// Tourism Module Models
+
+model Place {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  type        PlaceType
+  wilaya      String
+  lat         Float
+  lng         Float
+  coverUrl    String?
+  gallery     String[]
+  description String?
+  openHours   String?
+  priceHint   String?
+  tags        String[]
+  ratingAgg   Float       @default(0)
+  reviewCount Int         @default(0)
+  safetyNotes String?
+  featured    Boolean     @default(false)
+  active      Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  trips    Trip[]
+  reviews  PlaceReview[]
+  stops    ItineraryStop[]
+
+  @@index([type])
+  @@index([wilaya])
+  @@index([lat, lng])
+}
+
+model Itinerary {
+  id           String       @id @default(cuid())
+  title        String
+  description  String
+  coverUrl     String?
+  durationHint String?
+  distance     Float?
+  seasonality  SeasonType   @default(ALL)
+  difficulty   String?
+  tags         String[]
+  featured     Boolean      @default(false)
+  active       Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  stops ItineraryStop[]
+  trips Trip[]
+
+  @@index([seasonality])
+}
+
+model ItineraryStop {
+  id          String    @id @default(cuid())
+  itineraryId String
+  itinerary   Itinerary @relation(fields: [itineraryId], references: [id])
+  placeId     String
+  place       Place     @relation(fields: [placeId], references: [id])
+  order       Int
+  dwellMin    Int       @default(60)
+  note        String?
+
+  @@unique([itineraryId, order])
+  @@index([itineraryId])
+}
+
+model PlaceReview {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  placeId   String
+  place     Place    @relation(fields: [placeId], references: [id])
+  rating    Int
+  text      String?
+  photos    String[]
+  moderated Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, placeId])
+  @@index([placeId])
+}

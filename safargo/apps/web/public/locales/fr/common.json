@@ -1,0 +1,111 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "search": "Rechercher",
+    "publish": "Publier",
+    "explore": "Explorer",
+    "profile": "Profil",
+    "login": "Connexion",
+    "logout": "Déconnexion"
+  },
+  "hero": {
+    "title": "Voyagez ensemble,",
+    "subtitle": "découvrez l'Algérie",
+    "description": "Partagez vos trajets et explorez les merveilles touristiques de notre beau pays",
+    "searchButton": "Trouver un trajet",
+    "publishButton": "Publier un trajet",
+    "stats": {
+      "users": "Utilisateurs",
+      "destinations": "Destinations",
+      "satisfaction": "Satisfaction"
+    }
+  },
+  "search": {
+    "title": "Recherchez votre trajet idéal",
+    "origin": "Départ",
+    "originPlaceholder": "D'où partez-vous ?",
+    "destination": "Arrivée",
+    "destinationPlaceholder": "Où allez-vous ?",
+    "date": "Date",
+    "seats": "Places",
+    "searchButton": "Rechercher",
+    "popularRoutes": "Trajets populaires",
+    "priceFrom": "À partir de"
+  },
+  "tourism": {
+    "title": "Découvrez les merveilles de l'Algérie",
+    "description": "Explorez nos destinations touristiques et créez des trajets vers ces lieux magiques",
+    "goThere": "Y aller",
+    "exploreAll": "Explorer tous les lieux",
+    "reviews": "avis"
+  },
+  "howItWorks": {
+    "title": "Comment ça marche ?",
+    "description": "Partagez vos trajets en toute simplicité",
+    "steps": {
+      "search": {
+        "title": "Recherchez",
+        "description": "Trouvez le trajet qui correspond à vos besoins"
+      },
+      "book": {
+        "title": "Réservez",
+        "description": "Réservez votre place en quelques clics"
+      },
+      "pay": {
+        "title": "Payez",
+        "description": "Paiement sécurisé, débité après le trajet"
+      },
+      "rate": {
+        "title": "Évaluez",
+        "description": "Partagez votre expérience avec la communauté"
+      }
+    },
+    "forPassengers": {
+      "title": "Pour les passagers",
+      "benefits": [
+        "Trajets économiques partout en Algérie",
+        "Découverte de destinations touristiques",
+        "Paiement sécurisé après le trajet",
+        "Profils conducteurs vérifiés",
+        "Assurance voyage incluse"
+      ]
+    },
+    "forDrivers": {
+      "title": "Pour les conducteurs",
+      "benefits": [
+        "Rentabilisez vos trajets quotidiens",
+        "Communauté de voyageurs respectueux",
+        "Paiements garantis et rapides",
+        "Gestion simple de vos annonces",
+        "Support 24/7 en cas de besoin"
+      ]
+    }
+  },
+  "footer": {
+    "tagline": "Voyagez ensemble, découvrez l'Algérie",
+    "madeIn": "Made with ❤️ in DZ",
+    "sections": {
+      "carpooling": "Covoiturage",
+      "tourism": "Tourisme",
+      "about": "À propos"
+    },
+    "links": {
+      "searchTrip": "Rechercher un trajet",
+      "publishTrip": "Publier un trajet",
+      "howItWorks": "Comment ça marche",
+      "pricing": "Tarifs",
+      "exploreMap": "Explorer la carte",
+      "destinations": "Destinations",
+      "itineraries": "Itinéraires",
+      "blog": "Blog voyage",
+      "aboutUs": "Qui sommes-nous",
+      "contact": "Contact",
+      "careers": "Carrières",
+      "press": "Presse",
+      "terms": "Conditions d'utilisation",
+      "privacy": "Politique de confidentialité",
+      "cookies": "Cookies"
+    },
+    "copyright": "© {{year}} SafarGo. Tous droits réservés."
+  }
+}
