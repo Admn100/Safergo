@@ -1,0 +1,239 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SafarGo Global Styles */
+
+@layer base {
+  /* Import fonts */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap');
+
+  /* Base styles */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans text-gray-900 antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  /* Arabic font support */
+  [dir="rtl"] {
+    font-family: 'Cairo', system-ui, sans-serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+
+  /* Focus styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-green-500 ring-offset-2;
+  }
+
+  /* Selection styles */
+  ::selection {
+    @apply bg-brand-green-100 text-brand-green-900;
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  h1 {
+    @apply text-4xl lg:text-5xl;
+  }
+
+  h2 {
+    @apply text-3xl lg:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl lg:text-3xl;
+  }
+
+  h4 {
+    @apply text-xl lg:text-2xl;
+  }
+
+  h5 {
+    @apply text-lg lg:text-xl;
+  }
+
+  h6 {
+    @apply text-base lg:text-lg;
+  }
+
+  /* Links */
+  a {
+    @apply text-brand-green-600 hover:text-brand-green-700 transition-colors;
+  }
+}
+
+@layer components {
+  /* SafarGo brand components */
+  .safargo-gradient {
+    background: linear-gradient(135deg, #006233 0%, #D21034 100%);
+  }
+
+  .safargo-gradient-text {
+    @apply bg-gradient-to-r from-brand-green-600 to-brand-red-600 bg-clip-text text-transparent;
+  }
+
+  /* Glass morphism */
+  .glass {
+    @apply bg-white/80 backdrop-blur-lg border border-white/20;
+  }
+
+  .glass-dark {
+    @apply bg-black/20 backdrop-blur-lg border border-white/10;
+  }
+
+  /* Card styles */
+  .card-glass {
+    @apply bg-white/80 backdrop-blur-lg border border-white/20 rounded-2xl shadow-lg;
+  }
+
+  .card-elevated {
+    @apply bg-white border border-gray-100 rounded-2xl shadow-lg hover:shadow-xl transition-shadow;
+  }
+
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .animate-slide-down {
+    animation: slideDown 0.3s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+
+  /* Tourism category colors */
+  .tourism-beach { @apply text-cyan-600 bg-cyan-100; }
+  .tourism-waterfall { @apply text-blue-600 bg-blue-100; }
+  .tourism-mountain { @apply text-purple-600 bg-purple-100; }
+  .tourism-desert { @apply text-amber-600 bg-amber-100; }
+  .tourism-heritage { @apply text-red-600 bg-red-100; }
+  .tourism-museum { @apply text-violet-600 bg-violet-100; }
+  .tourism-food { @apply text-orange-600 bg-orange-100; }
+  .tourism-viewpoint { @apply text-emerald-600 bg-emerald-100; }
+  .tourism-park { @apply text-green-600 bg-green-100; }
+  .tourism-oasis { @apply text-lime-600 bg-lime-100; }
+  .tourism-medina { @apply text-yellow-600 bg-yellow-100; }
+  .tourism-lake { @apply text-blue-600 bg-blue-100; }
+  .tourism-cave { @apply text-gray-600 bg-gray-100; }
+
+  /* RTL support utilities */
+  .rtl-flip {
+    @apply rtl:scale-x-[-1];
+  }
+
+  .rtl-space-reverse {
+    @apply rtl:space-x-reverse;
+  }
+}
+
+@layer utilities {
+  /* Custom utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Safe area utilities for mobile */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-left {
+    padding-left: env(safe-area-inset-left);
+  }
+
+  .safe-right {
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  * {
+    color-adjust: exact;
+  }
+}

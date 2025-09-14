@@ -1,0 +1,35 @@
+# Development Dockerfile for SafarGo API
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install pnpm and development tools
+RUN npm install -g pnpm@8.15.0 && \
+    apk add --no-cache bash curl
+
+# Copy package files
+COPY package.json pnpm-workspace.yaml ./
+COPY packages/shared/package.json ./packages/shared/
+COPY apps/api/package.json ./apps/api/
+
+# Install dependencies
+RUN pnpm install
+
+# Copy source code
+COPY . .
+
+# Build shared package
+RUN pnpm -C packages/shared build
+
+# Generate Prisma client
+RUN pnpm -C apps/api prisma:generate
+
+WORKDIR /app/apps/api
+
+EXPOSE 3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:3001/health || exit 1
+
+CMD ["pnpm", "dev"]
