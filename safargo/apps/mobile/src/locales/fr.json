@@ -1,0 +1,80 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "search": "Rechercher",
+    "publish": "Publier",
+    "bookings": "Mes trajets",
+    "profile": "Profil"
+  },
+  "onboarding": {
+    "skip": "Passer",
+    "next": "Suivant",
+    "start": "Commencer"
+  },
+  "auth": {
+    "welcome": "Bienvenue sur SafarGo",
+    "email": "Email",
+    "phone": "Téléphone",
+    "emailPlaceholder": "votre@email.com",
+    "phonePlaceholder": "+213 XX XXX XX XX",
+    "requestOtp": "Recevoir le code",
+    "enterEmailOrPhone": "Veuillez entrer votre email ou téléphone",
+    "errorOtp": "Erreur lors de l'envoi du code",
+    "terms": "En continuant, vous acceptez nos conditions d'utilisation et notre politique de confidentialité",
+    "otpTitle": "Vérification",
+    "otpSubtitle": "Entrez le code à 6 chiffres envoyé à",
+    "otpResend": "Renvoyer le code",
+    "otpVerify": "Vérifier",
+    "otpError": "Code invalide ou expiré"
+  },
+  "home": {
+    "welcome": "Bonjour",
+    "searchPlaceholder": "Où allez-vous ?",
+    "nearbyTrips": "Trajets à proximité",
+    "tourismSpots": "Destinations touristiques",
+    "seeAll": "Voir tout"
+  },
+  "search": {
+    "title": "Rechercher un trajet",
+    "origin": "Départ",
+    "destination": "Arrivée",
+    "date": "Date",
+    "passengers": "Passagers",
+    "search": "Rechercher",
+    "results": "résultats trouvés",
+    "noResults": "Aucun trajet trouvé"
+  },
+  "trip": {
+    "from": "De",
+    "to": "À",
+    "departure": "Départ",
+    "seats": "places",
+    "rules": "Règles",
+    "driver": "Conducteur",
+    "vehicle": "Véhicule",
+    "book": "Réserver",
+    "message": "Message"
+  },
+  "booking": {
+    "title": "Réservation",
+    "selectSeats": "Nombre de places",
+    "total": "Total",
+    "confirm": "Confirmer et payer",
+    "success": "Réservation confirmée",
+    "pending": "En attente",
+    "confirmed": "Confirmée",
+    "cancelled": "Annulée",
+    "finished": "Terminée"
+  },
+  "profile": {
+    "editProfile": "Modifier le profil",
+    "becomeDriver": "Devenir conducteur",
+    "myVehicles": "Mes véhicules",
+    "settings": "Paramètres",
+    "help": "Aide",
+    "logout": "Déconnexion"
+  },
+  "error": "Erreur",
+  "success": "Succès",
+  "loading": "Chargement..."
+}

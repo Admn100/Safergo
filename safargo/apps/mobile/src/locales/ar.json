@@ -1,0 +1,80 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "search": "بحث",
+    "publish": "نشر",
+    "bookings": "رحلاتي",
+    "profile": "الملف الشخصي"
+  },
+  "onboarding": {
+    "skip": "تخطي",
+    "next": "التالي",
+    "start": "ابدأ"
+  },
+  "auth": {
+    "welcome": "مرحبًا بك في SafarGo",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "emailPlaceholder": "your@email.com",
+    "phonePlaceholder": "+213 XX XXX XX XX",
+    "requestOtp": "احصل على الرمز",
+    "enterEmailOrPhone": "يرجى إدخال بريدك الإلكتروني أو رقم هاتفك",
+    "errorOtp": "خطأ في إرسال الرمز",
+    "terms": "بالمتابعة، أنت توافق على شروط الاستخدام وسياسة الخصوصية",
+    "otpTitle": "التحقق",
+    "otpSubtitle": "أدخل الرمز المكون من 6 أرقام المرسل إلى",
+    "otpResend": "إعادة إرسال الرمز",
+    "otpVerify": "تحقق",
+    "otpError": "رمز غير صالح أو منتهي الصلاحية"
+  },
+  "home": {
+    "welcome": "مرحبًا",
+    "searchPlaceholder": "إلى أين تذهب؟",
+    "nearbyTrips": "رحلات قريبة",
+    "tourismSpots": "الوجهات السياحية",
+    "seeAll": "عرض الكل"
+  },
+  "search": {
+    "title": "البحث عن رحلة",
+    "origin": "المغادرة",
+    "destination": "الوصول",
+    "date": "التاريخ",
+    "passengers": "المسافرون",
+    "search": "بحث",
+    "results": "نتائج",
+    "noResults": "لم يتم العثور على رحلات"
+  },
+  "trip": {
+    "from": "من",
+    "to": "إلى",
+    "departure": "المغادرة",
+    "seats": "مقاعد",
+    "rules": "القواعد",
+    "driver": "السائق",
+    "vehicle": "المركبة",
+    "book": "احجز",
+    "message": "رسالة"
+  },
+  "booking": {
+    "title": "الحجز",
+    "selectSeats": "عدد المقاعد",
+    "total": "المجموع",
+    "confirm": "تأكيد والدفع",
+    "success": "تم تأكيد الحجز",
+    "pending": "قيد الانتظار",
+    "confirmed": "مؤكد",
+    "cancelled": "ملغى",
+    "finished": "منتهي"
+  },
+  "profile": {
+    "editProfile": "تعديل الملف الشخصي",
+    "becomeDriver": "كن سائقًا",
+    "myVehicles": "مركباتي",
+    "settings": "الإعدادات",
+    "help": "المساعدة",
+    "logout": "تسجيل الخروج"
+  },
+  "error": "خطأ",
+  "success": "نجاح",
+  "loading": "جار التحميل..."
+}
