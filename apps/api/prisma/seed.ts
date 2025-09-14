@@ -74,7 +74,7 @@ async function main() {
   });
 
   // Create vehicle
-  await prisma.vehicle.create({
+  const vehicle = await prisma.vehicle.create({
     data: {
       driverId: driver.id,
       make: 'Renault',
@@ -103,6 +103,7 @@ async function main() {
       await prisma.trip.create({
         data: {
           driverId: driver.id,
+          vehicleId: vehicle?.id,
           origin: {
             lat: 36.7372,
             lng: 3.0869,
@@ -110,8 +111,8 @@ async function main() {
             address: 'Place des Martyrs, Alger',
           },
           destination: {
-            lat: place.coords.lat,
-            lng: place.coords.lng,
+            lat: (place.coords as any).lat,
+            lng: (place.coords as any).lng,
             label: place.name,
             address: `${place.name}, ${place.wilaya}`,
           },
@@ -121,8 +122,7 @@ async function main() {
           rules: ['Pas de fumeur', 'Musique douce autorisée'],
           status: 'OPEN',
           placeId: place.id,
-          // tourismMode: true,
-        },
+        } as any,
       });
     }
   }

@@ -61,7 +61,7 @@ export class UsersService {
             trip: true,
           },
         },
-        reviews: true,
+        reviewsGiven: true,
         _count: {
           select: {
             bookings: true,

@@ -84,7 +84,7 @@ export class BookingsService {
     })
   }
 
-  async findOne(id: string): Promise<Booking> {
+  async findOne(id: string): Promise<any> {
     const booking = await this.prisma.booking.findUnique({
       where: { id },
       include: {

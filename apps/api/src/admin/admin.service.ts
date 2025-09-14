@@ -170,7 +170,7 @@ export class AdminService {
       include: {
         _count: {
           select: {
-            reviewsGiven: true,
+            reviews: true,
             trips: true,
           },
         },
