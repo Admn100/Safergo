@@ -1,0 +1,122 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: safargo-postgres-dev
+    environment:
+      POSTGRES_DB: safargo_dev
+      POSTGRES_USER: safargo
+      POSTGRES_PASSWORD: safargo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - safargo-network
+
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: safargo-postgres-test
+    environment:
+      POSTGRES_DB: safargo_test
+      POSTGRES_USER: safargo
+      POSTGRES_PASSWORD: safargo
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    networks:
+      - safargo-network
+    profiles: ["test"]
+
+  redis:
+    image: redis:7-alpine
+    container_name: safargo-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - safargo-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: safargo-minio-dev
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: safargo
+      MINIO_ROOT_PASSWORD: safargo123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - safargo-network
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: safargo-mailhog-dev
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - safargo-network
+
+  api:
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile.dev
+    container_name: safargo-api-dev
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://safargo:safargo@postgres:5432/safargo_dev
+      - REDIS_URL=redis://redis:6379
+      - STORAGE_ENDPOINT=http://minio:9000
+      - EMAIL_SMTP_HOST=mailhog
+      - EMAIL_SMTP_PORT=1025
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./apps/api:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+      - redis
+      - minio
+      - mailhog
+    networks:
+      - safargo-network
+    profiles: ["full"]
+
+  web:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile.dev
+    container_name: safargo-web-dev
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - api
+    networks:
+      - safargo-network
+    profiles: ["full"]
+
+volumes:
+  postgres_data:
+  postgres_test_data:
+  redis_data:
+  minio_data:
+
+networks:
+  safargo-network:
+    driver: bridge
