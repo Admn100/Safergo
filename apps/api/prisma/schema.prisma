@@ -1,0 +1,416 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===== CORE ENTITIES =====
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  phone     String?  @unique
+  name      String
+  photo     String?
+  locale    String   @default("fr")
+  roles     Role[]   @default([USER])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  driverProfile   Driver?
+  bookings        Booking[]
+  reviewsGiven    Review[] @relation("ReviewsGiven")
+  reviewsReceived Review[] @relation("ReviewsReceived")
+  sentMessages    Message[] @relation("MessageSender")
+  conversations   Conversation[] @relation("ConversationParticipant")
+  auditLogs       AuditLog[]
+  notifications   Notification[]
+  kycDocs         KycDoc[]
+  placeReviews    PlaceReview[]
+
+  @@map("users")
+}
+
+model Driver {
+  id           String     @id @default(cuid())
+  userId       String     @unique
+  kycStatus    KycStatus  @default(PENDING)
+  licenseNumber String?
+  badges       String[]   @default([])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relations
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicles Vehicle[]
+  trips   Trip[]
+
+  @@map("drivers")
+}
+
+model Vehicle {
+  id       String  @id @default(cuid())
+  driverId String
+  make     String
+  model    String
+  year     Int
+  color    String
+  seats    Int
+  plate    String  @unique
+  photos   String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  driver Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  trips  Trip[]
+
+  @@map("vehicles")
+}
+
+model Trip {
+  id          String    @id @default(cuid())
+  driverId    String
+  vehicleId   String
+  origin      Json      // {lat, lng, label}
+  destination Json      // {lat, lng, label}
+  dateTime    DateTime
+  seats       Int
+  pricePerSeat Float
+  rules       String[]  @default([])
+  status      TripStatus @default(DRAFT)
+  placeId     String?   // Tourism mode
+  itineraryId String?   // Tourism mode
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  driver        Driver        @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  vehicle       Vehicle       @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  bookings      Booking[]
+  reviews       Review[]
+  conversations Conversation[]
+  place         Place?        @relation(fields: [placeId], references: [id])
+  itinerary     Itinerary?    @relation(fields: [itineraryId], references: [id])
+
+  @@map("trips")
+}
+
+model Booking {
+  id         String        @id @default(cuid())
+  tripId     String
+  userId     String
+  seats      Int
+  priceTotal Float
+  status     BookingStatus @default(PENDING)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  // Relations
+  trip     Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments Payment[]
+  disputes Dispute[]
+
+  @@map("bookings")
+}
+
+model Payment {
+  id       String        @id @default(cuid())
+  bookingId String
+  intentId String?       // Stripe Payment Intent ID
+  status   PaymentStatus @default(INTENT)
+  amount   Float
+  currency String        @default("DZD")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  // Relations
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  text           String
+  flagged        Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  // Relations
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender      User          @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  tripId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  trip     Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  messages Message[]
+  participants User[] @relation("ConversationParticipant")
+
+  @@map("conversations")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  fromUserId String
+  toUserId   String
+  tripId     String
+  rating    Int      // 1-5
+  text      String?
+  moderated Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  fromUser User @relation("ReviewsGiven", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser   User @relation("ReviewsReceived", fields: [toUserId], references: [id], onDelete: Cascade)
+  trip     Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model Dispute {
+  id        String        @id @default(cuid())
+  bookingId String
+  reason    String
+  status    DisputeStatus @default(OPEN)
+  resolution String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  // Relations
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("disputes")
+}
+
+model KycDoc {
+  id         String    @id @default(cuid())
+  userId     String
+  type       KycDocType
+  url        String
+  status     KycStatus @default(PENDING)
+  reviewedBy String?
+  notes      String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("kyc_docs")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  channel   NotificationChannel
+  template  String
+  payload   Json
+  status    NotificationStatus @default(PENDING)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String
+  entity    String
+  entityId  String
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  // Relations
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@map("audit_logs")
+}
+
+// ===== TOURISM ENTITIES =====
+
+model Place {
+  id           String      @id @default(cuid())
+  name         String
+  slug         String      @unique
+  type         PlaceType
+  wilaya       String
+  coords       Json        // {lat, lng}
+  coverUrl     String?
+  gallery      String[]    @default([])
+  openHours    Json?       // {monday: {open: "09:00", close: "18:00"}, ...}
+  priceHint    String?
+  tags         String[]    @default([])
+  ratingAgg    Float       @default(0)
+  reviewCount  Int         @default(0)
+  safetyNotes  String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  // Relations
+  trips        Trip[]
+  reviews      PlaceReview[]
+  itineraryStops ItineraryStop[]
+
+  @@map("places")
+}
+
+model Itinerary {
+  id            String        @id @default(cuid())
+  title         String
+  description   String
+  coverUrl      String?
+  durationHint  String?       // "2-3 days", "1 week", etc.
+  seasonality   Seasonality   @default(ALL)
+  difficulty    String?       // "Easy", "Medium", "Hard"
+  tags          String[]      @default([])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  trips  Trip[]
+  stops  ItineraryStop[]
+
+  @@map("itineraries")
+}
+
+model ItineraryStop {
+  id           String @id @default(cuid())
+  itineraryId  String
+  placeId      String
+  order        Int
+  dwellMin     Int    @default(60) // Minutes to spend at this place
+
+  // Relations
+  itinerary Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  place     Place     @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([itineraryId, order])
+  @@map("itinerary_stops")
+}
+
+model PlaceReview {
+  id        String   @id @default(cuid())
+  userId    String
+  placeId   String
+  rating    Int      // 1-5
+  text      String?
+  photos    String[] @default([])
+  moderated Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@map("place_reviews")
+}
+
+// ===== ENUMS =====
+
+enum Role {
+  USER
+  DRIVER
+  ADMIN
+}
+
+enum KycStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum KycDocType {
+  ID_CARD
+  DRIVER_LICENSE
+  VEHICLE_REGISTRATION
+  INSURANCE
+  PROFILE_PHOTO
+}
+
+enum TripStatus {
+  DRAFT
+  OPEN
+  CONFIRMED
+  DONE
+  CANCELLED
+}
+
+enum BookingStatus {
+  PENDING
+  HELD
+  CONFIRMED
+  CANCELLED
+  FINISHED
+}
+
+enum PaymentStatus {
+  INTENT
+  HOLD
+  CAPTURED
+  REFUNDED
+}
+
+enum DisputeStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  PUSH
+  IN_APP
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  DELIVERED
+}
+
+enum PlaceType {
+  BEACH
+  WATERFALL
+  MOUNTAIN
+  DESERT
+  HERITAGE
+  MUSEUM
+  FOOD
+  VIEWPOINT
+  PARK
+  OASIS
+  MEDINA
+  LAKE
+}
+
+enum Seasonality {
+  SUMMER
+  WINTER
+  ALL
+}
