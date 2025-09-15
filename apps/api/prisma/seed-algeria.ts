@@ -12,6 +12,7 @@ async function main() {
     update: {},
     create: {
       email: 'admin@safargo.com',
+      password: '$2a$10$example.hash.for.admin',
       name: 'Admin SafarGo',
       phone: '+213555000001',
       roles: [Role.ADMIN, Role.DRIVER],
@@ -25,6 +26,7 @@ async function main() {
     update: {},
     create: {
       email: 'ahmed@safargo.com',
+      password: '$2a$10$example.hash.for.ahmed',
       name: 'Ahmed Benali',
       phone: '+213555000002',
       roles: [Role.DRIVER],
@@ -37,6 +39,7 @@ async function main() {
     update: {},
     create: {
       email: 'fatima@safargo.com',
+      password: '$2a$10$example.hash.for.fatima',
       name: 'Fatima Zohra',
       phone: '+213555000003',
       roles: [Role.DRIVER],
@@ -49,6 +52,7 @@ async function main() {
     update: {},
     create: {
       email: 'youssef@safargo.com',
+      password: '$2a$10$example.hash.for.youssef',
       name: 'Youssef Khelil',
       phone: '+213555000004',
       roles: [Role.DRIVER],
@@ -62,6 +66,7 @@ async function main() {
     update: {},
     create: {
       email: 'amina@safargo.com',
+      password: '$2a$10$example.hash.for.amina',
       name: 'Amina Boudjedra',
       phone: '+213555000005',
       roles: [Role.USER],
@@ -74,6 +79,7 @@ async function main() {
     update: {},
     create: {
       email: 'karim@safargo.com',
+      password: '$2a$10$example.hash.for.karim',
       name: 'Karim Belkacem',
       phone: '+213555000006',
       roles: [Role.USER],

@@ -1,55 +1,57 @@
-import { Injectable } from '@nestjs/common'
-import { PrismaService } from '../prisma/prisma.service'
-import { NotificationStatus, NotificationChannel } from '@prisma/client'
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateNotificationDto } from './dto/create-notification.dto';
+import { UpdateNotificationDto } from './dto/update-notification.dto';
 
 @Injectable()
 export class NotificationsService {
   constructor(private prisma: PrismaService) {}
 
-  async sendNotification(
-    userId: string,
-    channel: NotificationChannel,
-    template: string,
-    payload: any
-  ) {
-    // Create notification record
-    const notification = await this.prisma.notification.create({
+  async create(createNotificationDto: CreateNotificationDto) {
+    return this.prisma.notification.create({
       data: {
-        userId,
-        channel,
-        template,
-        payload,
-        status: NotificationStatus.PENDING,
+        userId: createNotificationDto.userId,
+        channel: 'PUSH',
+        template: createNotificationDto.title,
+        payload: { body: createNotificationDto.body, type: createNotificationDto.type },
       },
-    })
-
-    // TODO: Implement actual sending logic based on channel
-    // - SMS via Twilio
-    // - Email via SendGrid
-    // - Push via FCM/APNs
-    // - In-app notifications
-
-    // Update status to sent
-    return this.prisma.notification.update({
-      where: { id: notification.id },
-      data: { status: NotificationStatus.SENT },
-    })
+    });
   }
 
-  async getUserNotifications(userId: string) {
+  async findAll() {
     return this.prisma.notification.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-    })
+      include: {
+        user: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
   }
 
-  async markAsRead(notificationId: string, userId: string) {
-    return this.prisma.notification.updateMany({
-      where: { 
-        id: notificationId,
-        userId,
+  async findOne(id: string) {
+    return this.prisma.notification.findUnique({
+      where: { id },
+      include: {
+        user: true,
       },
-      data: { status: NotificationStatus.DELIVERED },
-    })
+    });
+  }
+
+  async update(id: string, updateNotificationDto: UpdateNotificationDto) {
+    return this.prisma.notification.update({
+      where: { id },
+      data: {
+        template: updateNotificationDto.title,
+        payload: { body: updateNotificationDto.body, type: updateNotificationDto.type },
+        status: updateNotificationDto.read ? 'SENT' : 'PENDING',
+      },
+    });
+  }
+
+  async remove(id: string) {
+    return this.prisma.notification.delete({
+      where: { id },
+    });
   }
 }

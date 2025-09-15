@@ -18,6 +18,7 @@ export interface NotificationState {
   unreadCount: number
   isEnabled: boolean
   expoPushToken: string | null
+  cleanup?: () => void
 }
 
 export interface NotificationActions {
@@ -129,10 +130,13 @@ export const useNotificationStore = create<NotificationState & NotificationActio
 
         set({ isEnabled: true })
 
-        return () => {
-          subscription.remove()
-          responseSubscription.remove()
-        }
+        // Store cleanup function
+        set({ 
+          cleanup: () => {
+            subscription.remove()
+            responseSubscription.remove()
+          }
+        })
       } catch (error) {
         console.error('Error initializing notifications:', error)
       }

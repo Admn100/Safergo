@@ -28,6 +28,7 @@ async function main() {
   const adminUser = await prisma.user.create({
     data: {
       email: 'admin@safargo.com',
+      password: '$2a$10$example.hash.for.admin',
       name: 'Admin SafarGo',
       phone: '+213555000001',
       locale: 'fr',
@@ -40,6 +41,7 @@ async function main() {
   const driverUser = await prisma.user.create({
     data: {
       email: 'ahmed@safargo.com',
+      password: '$2a$10$example.hash.for.driver',
       name: 'Ahmed Benali',
       phone: '+213555000002',
       locale: 'ar',
@@ -52,6 +54,7 @@ async function main() {
   const passengerUser = await prisma.user.create({
     data: {
       email: 'amina@safargo.com',
+      password: '$2a$10$example.hash.for.passenger',
       name: 'Amina Khelil',
       phone: '+213555000003',
       locale: 'fr',
